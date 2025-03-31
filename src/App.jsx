@@ -43,8 +43,19 @@ function App() {
     ELSE do nothing
   */
   const addTask = () => {
-    // START EDITING
-    // END EDITING
+    if (title) {
+      const newTask = {
+        id: uuidv4(),
+        title: title,
+        description: description,
+        completed: false,
+        dueDate: dueDate,
+      };
+      setTasks((prevTasks) => [...prevTasks, newTask]);
+      setTitle("");
+      setDescription("");
+      setDueDate("");
+    }
   };
 
   /*
@@ -60,8 +71,11 @@ function App() {
     HINT HINT NUDGE NUDGE: I'm getting some Week 4 HW flashbacks...are you?
   */
   const toggleCompletion = (id) => {
-    // START EDITING
-    // END EDITING
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === id ? { ...task, completed: !task.completed } : task
+      )
+    );
   };
   
   /*
@@ -96,8 +110,9 @@ function App() {
     component to the result of calling calculateProgress.
   */
   const calculateProgress = () => {
-    // START EDITING
-    // END EDITING
+    if (tasks.length === 0) return 0;
+    const completedTaskCount = tasks.filter((task) => task.completed).length;
+    return (completedTaskCount / tasks.length) * 100;
   };
 
   return (
@@ -113,25 +128,31 @@ function App() {
           it does is call setTitle/setDescription/setDueDate to the e.target.value. SEE THE SLIDE
           "Event handlers with a parameter" from class FOR MORE INFO.
         */}
-        <TextField
+       <TextField
           required
           label="Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
         />
         <TextField
           label="Description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
         />
         <TextField
           label="Due Date"
           type="date"
           InputLabelProps={{ shrink: true }}
+          value={dueDate}
+          onChange={(e) => setDueDate(e.target.value)}
         />
-        <Button variant="contained">
+        <Button variant="contained" onClick={addTask}>
           Add Task
         </Button>
       </div>
 
       <FormControlLabel
-        control={<Switch/>}
+        control={<Switch checked={incompleteOnly} />}
         label="Incomplete Tasks Only"
         onChange={() => {
           setIncompleteOnly(!incompleteOnly);
@@ -140,10 +161,11 @@ function App() {
       />
       <LinearProgress
         variant="determinate"
+        value={calculateProgress()}
         sx={{ width: "100%", height: 10, borderRadius: 5, marginBottom: 2 }}
       />
       <TaskTable 
-        tasks={incompleteOnly ? tasks.filter((task) => !task.completed) : tasks } 
+        tasks={incompleteOnly ? tasks.filter((task) => !task.completed) : tasks} 
         toggleCompletion={toggleCompletion}
         deleteTask={deleteTask}
       />
@@ -152,3 +174,4 @@ function App() {
 }
 
 export default App;
+
